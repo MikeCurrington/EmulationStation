@@ -7,7 +7,7 @@ EmulationStation is a cross-platform graphical front-end for emulators with cont
 Building
 ========
 
-EmulationStation uses some C++11 code, which means you'll need to use at least g++-4.7 on Linux, or VS2010 on Windows, to compile.
+EmulationStation uses some C++11 code, which means you'll need to use at least g++-4.9 on Linux, or VS2010 on Windows, to compile.
 
 EmulationStation has a few dependencies. For building, you'll need CMake, SDL2, Boost (System, Filesystem, DateTime, Locale), FreeImage, FreeType, Eigen3, and cURL.  You also should probably install the `fonts-droid` package which contains fallback fonts for Chinese/Japanese/Korean characters, but ES will still work fine without it (this package is only used at run-time).
 

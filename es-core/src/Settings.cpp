@@ -74,6 +74,7 @@ void Settings::setDefaults()
 	#else
 		mIntMap["MaxVRAM"] = 100;
 	#endif
+        mIntMap["Rotate"] = 1;
 
 	mStringMap["TransitionStyle"] = "fade";
 	mStringMap["ThemeSet"] = "";

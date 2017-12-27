@@ -16,6 +16,11 @@ namespace Renderer
 
 	unsigned int display_width = 0;
 	unsigned int display_height = 0;
+        int offsetX = 0;
+        int offsetY = 0;
+        int offsetX2 = 0;
+        int offsetY2 = -1920;//540;//-540;
+        int rotateZ = 90;
 
 	unsigned int getScreenWidth() { return display_width; }
 	unsigned int getScreenHeight() { return display_height; }
@@ -68,6 +73,12 @@ namespace Renderer
 			return false;
 		}
 
+                SDL_Rect dispBounds;
+                SDL_GetDisplayBounds( 0, &dispBounds );
+
+#if 0 //mjc
+                std::swap( display_width, display_height );
+#endif
 		LOG(LogInfo) << "Created window successfully.";
 
 		//set an icon for the window
@@ -145,13 +156,24 @@ namespace Renderer
 		if(!createdSurface)
 			return false;
 
-		glViewport(0, 0, display_width, display_height);
-
-		glMatrixMode(GL_PROJECTION);
-		glOrtho(0, display_width, display_height, 0, -1.0, 1.0);
-		glMatrixMode(GL_MODELVIEW);
+                int rotate = Settings::getInstance()->getInt("Rotate");
+		if (rotate & 1)
+                {
+                    std::swap(display_height, display_width);
+                    glViewport(0, 0, display_height, display_width);
+                    glMatrixMode(GL_PROJECTION);
+                    glOrtho(0, display_height, display_width, 0, -1.0, 1.0);
+                    glRotatef(rotate*90, 0, 0, 1);
+                    glTranslatef(offsetX2, -1920/*display_width*//*offsetY2*/, 0);
+                }
+                else
+                {
+                    glViewport(0, 0, display_width, display_height);
+		    glMatrixMode(GL_PROJECTION);
+		    glOrtho(0, display_width, display_height, 0, -1.0, 1.0);
+                }
+                glMatrixMode(GL_MODELVIEW);
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
 		return true;
 	}
 

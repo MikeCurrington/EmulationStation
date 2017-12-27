@@ -1,5 +1,6 @@
 #include "Renderer.h"
 
+#include "Settings.h"
 #include "math/Misc.h"
 #include "Log.h"
 #include <stack>
@@ -42,12 +43,28 @@ namespace Renderer {
 		if(box.h == 0)
 			box.h = Renderer::getScreenHeight() - box.y;
 
+#if 0//mjc
 		//glScissor starts at the bottom left of the window
 		//so (0, 0, 1, 1) is the bottom left pixel
 		//everything else uses y+ = down, so flip it to be consistent
 		//rect.pos.y = Renderer::getScreenHeight() - rect.pos.y - rect.size.y;
 		box.y = Renderer::getScreenHeight() - box.y - box.h;
+#else
+                int rotate = Settings::getInstance()->getInt("Rotate");
+                if (rotate & 1)
+                {
+                    //box.y = Renderer::getScreenHeight() - box.y - box.h;
+                    std::swap(box.x, box.y);
+                    std::swap(box.w, box.h);
+box.y = Renderer::getScreenWidth() - box.y - box.h;
+                }
+                else
+                {
+                    box.y = Renderer::getScreenHeight() - box.y - box.h;
+                }
 
+
+#endif
 		//make sure the box fits within clipStack.top(), and clip further accordingly
 		if(clipStack.size())
 		{
@@ -68,7 +85,7 @@ namespace Renderer {
 			box.h = 0;
 
 		clipStack.push(box);
-		glScissor(box.x, box.y, box.w, box.h);
+		//mjc glScissor(box.x, box.y, box.w, box.h);
 		glEnable(GL_SCISSOR_TEST);
 	}
 
@@ -85,8 +102,8 @@ namespace Renderer {
 		{
 			glDisable(GL_SCISSOR_TEST);
 		}else{
-			const ClipRect& top = clipStack.top();
-			glScissor(top.x, top.y, top.w, top.h);
+			//mjc const ClipRect& top = clipStack.top();
+			//mjc glScissor(top.x, top.y, top.w, top.h);
 		}
 	}
 

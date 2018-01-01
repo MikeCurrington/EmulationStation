@@ -17,16 +17,18 @@
 if(VLC_INCLUDE_DIR AND VLC_LIBRARIES)
    # in cache already
    set(VLC_FIND_QUIETLY TRUE)
+   message("VLC_INCLUDE_DIR and VLC_LIBRARIES set")
 endif(VLC_INCLUDE_DIR AND VLC_LIBRARIES)
 
 # use pkg-config to get the directories and then use these values
 # in the FIND_PATH() and FIND_LIBRARY() calls
-if(NOT WIN32)
+#mjc if(NOT WIN32)
+if(NOT WIN32 AND NOT ${APPLE})
   find_package(PkgConfig)
   pkg_check_modules(VLC libvlc>=1.0.0)
   set(VLC_DEFINITIONS ${VLC_CFLAGS})
   set(VLC_LIBRARIES ${VLC_LDFLAGS})
-endif(NOT WIN32)
+endif(NOT WIN32 AND NOT ${APPLE})
 
 # TODO add argument support to pass version on find_package
 include(MacroEnsureVersion)

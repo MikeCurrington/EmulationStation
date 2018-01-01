@@ -11,13 +11,21 @@ std::string getHomePath()
 {
 	std::string homePath;
 
-	// this should give you something like "/home/YOUR_USERNAME" on Linux and "C:\Users\YOUR_USERNAME\" on Windows
-	const char * envHome = getenv("HOME");
-	if(envHome != nullptr)
-	{
-		homePath = envHome;
-	}
-
+    const char * envPath = getenv("PWD");
+    if(envPath != nullptr)
+    {
+        homePath = envPath;
+    }
+    else
+    {
+        // this should give you something like "/home/YOUR_USERNAME" on Linux and "C:\Users\YOUR_USERNAME\" on Windows
+        const char * envHome = getenv("HOME");
+        if(envHome != nullptr)
+        {
+            homePath = envHome;
+        }
+    }
+    
 #ifdef WIN32
 	// but does not seem to work for Windows XP or Vista, so try something else
 	if (homePath.empty()) {

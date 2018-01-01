@@ -10,12 +10,15 @@
 #elif defined(WIN32)
 #include <Windows.h>
 #endif
+#include <thread>
+#include <chrono>
 
 std::ostream& out = std::cout;
 
 void handle_interrupt_signal(int /*p*/)
 {
-	sleep(50);
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    //sleep(50);
 
 	LOG(LogInfo) << "Interrupt received during scrape...";
 

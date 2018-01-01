@@ -29,7 +29,7 @@ protected:
 	using IList<TextListData, T>::getTransform;
 	using IList<TextListData, T>::mSize;
 	using IList<TextListData, T>::mCursor;
-	using IList<TextListData, T>::Entry;
+	//using IList<TextListData, T>::Entry;
 
 public:
 	using IList<TextListData, T>::size;

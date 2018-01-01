@@ -29,6 +29,8 @@ CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
 Makefile
+*.xcodeproj/
+CMakeScripts
 
 # Eclipse
 .cproject

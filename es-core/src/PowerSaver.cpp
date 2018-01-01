@@ -28,7 +28,7 @@ int PowerSaver::getTimeout()
 void PowerSaver::loadWakeupTime()
 {
 	// TODO : Move this to Screensaver Class
-	std::string behaviour = Settings::getInstance()->getString("ScreenSaverBehavior");
+	const std::string& behaviour = Settings::getInstance()->getString("ScreenSaverBehavior");
 	if (behaviour == "random video")
 		mWakeupTimeout = Settings::getInstance()->getInt("ScreenSaverSwapVideoTimeout") - getMode();
 	else if (behaviour == "slideshow")

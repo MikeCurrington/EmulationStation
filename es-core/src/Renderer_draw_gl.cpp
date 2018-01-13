@@ -47,8 +47,9 @@ namespace Renderer {
 		//glScissor starts at the bottom left of the window
 		//so (0, 0, 1, 1) is the bottom left pixel
 		//everything else uses y+ = down, so flip it to be consistent
-		//rect.pos.y = Renderer::getScreenHeight() - rect.pos.y - rect.size.y;
-		box.y = Renderer::getScreenHeight() - box.y - box.h;
+                //also take screen height and offset into account
+                box.x = Renderer::getScreenOffsetX() + box.x;
+                box.y = Renderer::getWindowHeight() - Renderer::getScreenOffsetY() - box.y - box.h;
 #else
                 int rotate = Settings::getInstance()->getInt("Rotate");
                 if (rotate & 1)
@@ -63,6 +64,11 @@ box.y = Renderer::getScreenWidth() - box.y - box.h;
                     box.y = Renderer::getScreenHeight() - box.y - box.h;
                 }
 
+/*mjc implement this
+		//also take screen height and offset into account
+		box.x = Renderer::getScreenOffsetX() + box.x;
+		box.y = Renderer::getWindowHeight() - Renderer::getScreenOffsetY() - box.y - box.h;
+*/
 
 #endif
 		//make sure the box fits within clipStack.top(), and clip further accordingly

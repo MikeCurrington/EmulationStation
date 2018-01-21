@@ -3,6 +3,7 @@
 
 #include "utils/StringUtil.h"
 #include "AudioManager.h"
+#include "Renderer.h"
 #include "Settings.h"
 #include <fcntl.h>
 #include <wait.h>
@@ -90,17 +91,34 @@ void VideoPlayerComponent::startVideo()
 			}
 			else
 			{
+                                // handle screen rotation
+                                char orientationBuf[8];
+                                int rotation = Settings::getInstance()->getInt("Rotate");
+                                sprintf(orientationBuf, "%d", (int)rotation*90);
 
 				// Find out the pixel position of the video view and build a command line for
 				// omxplayer to position it in the right place
 				char buf[32];
-				float x = mPosition.x() - (mOrigin.x() * mSize.x());
+				//float x = mPosition.x() - (mOrigin.x() * mSize.x());
 				float y = mPosition.y() - (mOrigin.y() * mSize.y());
-				sprintf(buf, "%d,%d,%d,%d", (int)x, (int)y, (int)(x + mSize.x()), (int)(y + mSize.y()));
+				if (rotation & 1)
+				{
+                                	float x = mPosition.x() - (mOrigin.x() * mSize.x()); 
+					float y = Renderer::getScreenHeight() - (mPosition.y() - ((mOrigin.y() - 1.0f) * mSize.y()));
+					float y2 = (int)(y + mSize.y());
+                                	sprintf(buf, "%d,%d,%d,%d", (int)y, (int)x, (int)y2, (int)(x + mSize.x()));
+				}
+				else
+				{
+			                float x = mPosition.x() - (mOrigin.x() * mSize.x());
+					float y = mPosition.y() - (mOrigin.y() * mSize.y());
+					sprintf(buf, "%d,%d,%d,%d", (int)x, (int)y, (int)(x + mSize.x()), (int)(y + mSize.y()));
+				}
+				
 				// We need to specify the layer of 10000 or above to ensure the video is displayed on top
 				// of our SDL display
 
-				const char* argv[] = { "", "--layer", "10010", "--loop", "--no-osd", "--aspect-mode", "letterbox", "--vol", "0", "-o", "both","--win", buf, "--no-ghost-box", "", "", "", "", NULL };
+				const char* argv[] = { "", "--layer", "10010", "--loop", "--no-osd", "--aspect-mode", "letterbox", "--vol", "0", "-o", "both","--win", buf, "--orientation", orientationBuf, "--no-ghost-box", "", "", "", "", NULL };
 
 				// check if we want to mute the audio
 				if (!Settings::getInstance()->getBool("VideoAudio") || (float)VolumeControl::getInstance()->getVolume() == 0)
@@ -128,14 +146,14 @@ void VideoPlayerComponent::startVideo()
 					if (Settings::getInstance()->getString("ScreenSaverGameInfo") != "never")
 					{
 						// if we have chosen to render subtitles
-						argv[13] = "--subtitles";
-						argv[14] = subtitlePath.c_str();
-						argv[15] = mPlayingVideoPath.c_str();
+						argv[15] = "--subtitles";
+						argv[16] = subtitlePath.c_str();
+						argv[17] = mPlayingVideoPath.c_str();
 					}
 					else
 					{
 						// if we have chosen NOT to render subtitles in the screensaver
-						argv[13] = mPlayingVideoPath.c_str();
+						argv[15] = mPlayingVideoPath.c_str();
 					}
 				}
 				else
@@ -145,7 +163,7 @@ void VideoPlayerComponent::startVideo()
 					{
 						argv[6] = "stretch";
 					}
-					argv[13] = mPlayingVideoPath.c_str();
+					argv[15] = mPlayingVideoPath.c_str();
 				}
 
 				argv[10] = Settings::getInstance()->getString("OMXAudioDev").c_str();
@@ -154,11 +172,18 @@ void VideoPlayerComponent::startVideo()
 				const char* env[] = { "LD_LIBRARY_PATH=/opt/vc/libs:/usr/lib/omxplayer", NULL };
 
 				// Redirect stdout
-				int fdin = open("/dev/null", O_RDONLY);
-				int fdout = open("/dev/null", O_WRONLY);
-				dup2(fdin, 0);
-				dup2(fdout, 1);
+				//int fdin = open("/dev/null", O_RDONLY);
+				//int fdout = open("/dev/null", O_WRONLY);
+				//dup2(fdin, 0);
+				//dup2(fdout, 1);
 				// Run the omxplayer binary
+				fprintf(stderr, "%s : mpos %f %f msize %f %f morigin %f %f screen %d %d\n", buf, mPosition.x(), mPosition.y(), mSize.x(), mSize.y(), mOrigin.x(), mOrigin.y(), Renderer::getScreenWidth(), Renderer::getScreenHeight());
+char** pArg = (char**)argv;
+while( *pArg )
+{
+fputs(*pArg, stderr); fputs(" ", stderr);
+pArg++;
+}
 				execve("/usr/bin/omxplayer.bin", (char**)argv, (char**)env);
 
 				_exit(EXIT_FAILURE);

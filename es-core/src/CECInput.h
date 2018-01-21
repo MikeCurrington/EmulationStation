@@ -2,6 +2,8 @@
 #ifndef ES_CORE_CECINPUT_H
 #define ES_CORE_CECINPUT_H
 
+#undef HAVE_LIBCEC
+
 #include <string>
 
 namespace CEC { class ICECAdapter; }

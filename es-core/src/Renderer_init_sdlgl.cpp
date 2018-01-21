@@ -177,6 +177,7 @@ namespace Renderer
         }
         glMatrixMode(GL_MODELVIEW);
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
 		return true;
 	}
 

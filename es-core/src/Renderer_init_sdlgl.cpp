@@ -14,19 +14,25 @@ namespace Renderer
 {
 	static bool initialCursorState;
 
-	unsigned int windowWidth   = 0;
-	unsigned int windowHeight  = 0;
-	unsigned int screenWidth   = 0;
-	unsigned int screenHeight  = 0;
-	unsigned int screenOffsetX = 0;
-	unsigned int screenOffsetY = 0;
+    int windowWidth   = 0;
+	int windowHeight  = 0;
+	int screenWidth   = 0;
+	int screenHeight  = 0;
+	int screenOffsetX = 0;
+	int screenOffsetY = 0;
+    int screenUnRotatedWidth = 0;
+    int screenUnRotatedHeight = 0;
+    int screenRotate = 0;
 
-	unsigned int getWindowWidth()   { return windowWidth; }
-	unsigned int getWindowHeight()  { return windowHeight; }
-	unsigned int getScreenWidth()   { return screenWidth; }
-	unsigned int getScreenHeight()  { return screenHeight; }
-	unsigned int getScreenOffsetX() { return screenOffsetX; }
-	unsigned int getScreenOffsetY() { return screenOffsetY; }
+	int getWindowWidth()   { return windowWidth; }
+	int getWindowHeight()  { return windowHeight; }
+	int getScreenWidth()   { return screenWidth; }
+	int getScreenHeight()  { return screenHeight; }
+	int getScreenOffsetX() { return screenOffsetX; }
+	int getScreenOffsetY() { return screenOffsetY; }
+    int getScreenUnrotatedWidth()   { return screenUnRotatedWidth; }
+    int getScreenUnrotatedHeight()  { return screenUnRotatedHeight; }
+    int getScreenRotate()  { return screenRotate; }
 
 	SDL_Window* sdlWindow = NULL;
 	SDL_GLContext sdlContext = NULL;
@@ -77,6 +83,9 @@ namespace Renderer
 			LOG(LogError) << "Error creating SDL window!\n\t" << SDL_GetError();
 			return false;
 		}
+
+        SDL_Rect dispBounds;
+        SDL_GetDisplayBounds( 0, &dispBounds );
 
 		LOG(LogInfo) << "Created window successfully.";
 
@@ -142,13 +151,32 @@ namespace Renderer
 		if(!createSurface())
 			return false;
 
-		//gotta flip y since y=0 is at the bottom
-		glViewport(screenOffsetX, windowHeight - screenHeight - screenOffsetY, screenWidth, screenHeight);
-		glMatrixMode(GL_PROJECTION);
-		glOrtho(0, screenWidth, screenHeight, 0, -1.0, 1.0);
-		glMatrixMode(GL_MODELVIEW);
+        screenUnRotatedWidth = screenWidth;
+        screenUnRotatedHeight = screenHeight;
+        
+        screenRotate = Settings::getInstance()->getInt("Rotate");
+		if ((screenRotate & 1)!=0)
+        {
+            std::swap(screenHeight, screenWidth);
+            std::swap(windowHeight, windowWidth);
+        }
+        
+        if (true)
+        {
+            glViewport(0, 0, screenUnRotatedWidth, screenUnRotatedHeight);
+            glMatrixMode(GL_PROJECTION);
+            glOrtho(0, screenUnRotatedWidth, screenUnRotatedHeight, 0, -1.0, 1.0);
+            glRotatef(screenRotate*90, 0, 0, 1);
+            glTranslatef((screenRotate & 2) ? -int(screenWidth) : 0, (screenRotate > 0 && screenRotate < 3) ? -int(screenHeight) : 0, 0);
+        }
+        else
+        {
+            glViewport(screenOffsetX, windowHeight - screenHeight - screenOffsetY, screenWidth, screenHeight);
+            glMatrixMode(GL_PROJECTION);
+            glOrtho(0, screenWidth, screenHeight, 0, -1.0, 1.0);
+        }
+        glMatrixMode(GL_MODELVIEW);
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-
 		return true;
 	}
 

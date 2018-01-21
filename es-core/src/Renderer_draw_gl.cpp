@@ -1,8 +1,10 @@
 #include "Renderer.h"
 
+#include "Settings.h"
 #include "math/Misc.h"
 #include "Log.h"
 #include <stack>
+#include <math.h>
 
 namespace Renderer {
 	struct ClipRect {
@@ -42,14 +44,62 @@ namespace Renderer {
 		if(box.h == 0)
 			box.h = Renderer::getScreenHeight() - box.y;
 
-		//glScissor starts at the bottom left of the window
-		//so (0, 0, 1, 1) is the bottom left pixel
-		//everything else uses y+ = down, so flip it to be consistent
-		//also take screen height and offset into account
-		box.x = Renderer::getScreenOffsetX() + box.x;
-		box.y = Renderer::getWindowHeight() - Renderer::getScreenOffsetY() - box.y - box.h;
+        int rotate = Renderer::getScreenRotate();
+        float boxEndX = box.x + box.w;
+        float boxEndY = box.y + box.h;
+        float tmpX = box.x, tmpY = box.y;
+        float tmpEndX = boxEndX, tmpEndY = boxEndY;
 
-		//make sure the box fits within clipStack.top(), and clip further accordingly
+        switch(rotate)
+        {
+            default:
+                break;
+            case 1:
+                tmpX = -box.y + Renderer::getScreenHeight();
+                tmpY = box.x;
+                tmpEndX = -boxEndY + Renderer::getScreenHeight();
+                tmpEndY = boxEndX;
+                break;
+            case 2:
+                tmpY = Renderer::getScreenHeight() - box.y;
+                tmpEndY = Renderer::getScreenHeight() - boxEndY;
+                break;
+            case 3:
+                tmpX = box.y;
+                tmpY = -box.x + Renderer::getScreenWidth();
+                tmpEndX = boxEndY;
+                tmpEndY = -boxEndX + Renderer::getScreenWidth();
+                break;
+        }
+        
+        //glScissor starts at the bottom left of the window
+        //so (0, 0, 1, 1) is the bottom left pixel
+        //everything else uses y+ = down, so flip it to be consistent
+        tmpY = Renderer::getScreenUnrotatedHeight() - tmpY;
+        tmpEndY = Renderer::getScreenUnrotatedHeight() - tmpEndY;
+
+        if (tmpEndX > tmpX)
+        {
+            box.x = tmpX;
+            box.w = tmpEndX - tmpX;
+        }
+        else
+        {
+            box.x = tmpEndX;
+            box.w = tmpX - tmpEndX;
+        }
+        if (tmpEndY > tmpY)
+        {
+            box.y = tmpY;
+            box.h = tmpEndY - tmpY;
+        }
+        else
+        {
+            box.y = tmpEndY;
+            box.h = tmpY - tmpEndY;
+        }
+
+        //make sure the box fits within clipStack.top(), and clip further accordingly
 		if(clipStack.size())
 		{
 			const ClipRect& top = clipStack.top();

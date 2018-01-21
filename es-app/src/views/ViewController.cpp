@@ -291,7 +291,7 @@ std::shared_ptr<IGameListView> ViewController::getGameListView(SystemData* syste
 		std::vector<FileData*> files = system->getRootFolder()->getFilesRecursive(GAME | FOLDER);
 		for (auto it = files.cbegin(); it != files.cend(); it++)
 		{
-			if (themeHasVideoView && !(*it)->getVideoPath().empty())
+			if (!(*it)->getVideoPath().empty() && themeHasVideoView)
 			{
 				selectedViewType = VIDEO;
 				break;

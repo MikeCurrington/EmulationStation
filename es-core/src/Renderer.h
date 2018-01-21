@@ -18,12 +18,15 @@ namespace Renderer
 	bool init();
 	void deinit();
 
-	unsigned int getWindowWidth();
-	unsigned int getWindowHeight();
-	unsigned int getScreenWidth();
-	unsigned int getScreenHeight();
-	unsigned int getScreenOffsetX();
-	unsigned int getScreenOffsetY();
+    int getWindowWidth();
+    int getWindowHeight();
+    int getScreenWidth();
+    int getScreenHeight();
+    int getScreenOffsetX();
+    int getScreenOffsetY();
+    int getScreenUnrotatedWidth();
+    int getScreenUnrotatedHeight();
+    int getScreenRotate();
 
 	void buildGLColorArray(GLubyte* ptr, unsigned int color, unsigned int vertCount);
 

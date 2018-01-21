@@ -1,0 +1,2 @@
+cmake -DCMAKE_CXX_COMPILER=g++-4.9 -DCMAKE_BUILD_TYPE=Release .
+make

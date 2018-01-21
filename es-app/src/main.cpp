@@ -119,6 +119,17 @@ bool parseArgs(int argc, char* argv[])
 		{
 			Settings::getInstance()->setBool("ForceKid", true);
 		}
+        else if (strcmp(argv[i], "--rotate") == 0)
+        {
+            if(i >= argc - 1)
+            {
+                std::cerr << "Invalid rotate value supplied (valid 0 - 3).";
+                return false;
+            }
+            
+            int r = atoi(argv[++i]);
+            Settings::getInstance()->setInt("Rotate", r);
+        }
 		else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0)
 		{
 #ifdef WIN32

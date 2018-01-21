@@ -320,6 +320,15 @@ void GuiMenu::openOtherSettings()
 	s->addWithLabel("VRAM LIMIT", max_vram);
 	s->addSaveFunc([max_vram] { Settings::getInstance()->setInt("MaxVRAM", (int)Math::round(max_vram->getValue())); });
 
+    // screen rotate
+    auto rotate = std::make_shared<SliderComponent>(mWindow, 0.f, 3.f, 1.f, " ");
+    rotate->setValue((float)(Settings::getInstance()->getInt("Rotate")));
+    s->addWithLabel("SCREEN ROTATE", rotate);
+    s->addSaveFunc([rotate] {
+        int rotateI = (int)Math::round(rotate->getValue());
+        Settings::getInstance()->setInt("Rotate", rotateI);
+    });
+
 	// power saver
 	auto power_saver = std::make_shared< OptionListComponent<std::string> >(mWindow, "POWER SAVER MODES", false);
 	std::vector<std::string> modes;

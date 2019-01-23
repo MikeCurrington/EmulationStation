@@ -12,6 +12,7 @@ LIST(APPEND CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake/Packages
 )
 #mjc - set vlc location
+if(APPLE)
 LIST(APPEND CMAKE_PREFIX_PATH
     /Users/Mike/Projects/RetroPi-OSX/EmulationStation/../libvlc/vlc-3.0/build/vlc_install_dir
 )
@@ -24,6 +25,7 @@ set(VLC_VERSION_OK TRUE)
 #  VLC_INCLUDE_DIR - The VLC include directory
 #  VLC_LIBRARIES - The libraries needed to use VLC
 #  VLC_DEFINITIONS
+endif(APPLE)
 
 #-------------------------------------------------------------------------------
 #set up OpenGL system variable

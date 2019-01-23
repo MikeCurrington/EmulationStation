@@ -6,6 +6,7 @@
 #include "components/VideoComponent.h"
 
 void catch_child(int sig_num);
+void catch_sigttin(int sig_num);
 
 class VideoPlayerComponent : public VideoComponent
 {

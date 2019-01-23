@@ -86,6 +86,7 @@ void VideoPlayerComponent::startVideo()
 				mPlayerPid = pid;
 				// Update the playing state
 				signal(SIGCHLD, catch_child);
+                                signal(SIGTTIN, catch_sigttin);
 				mIsPlaying = true;
 				mFadeIn = 0.0f;
 			}
@@ -171,11 +172,6 @@ void VideoPlayerComponent::startVideo()
 				//const char* argv[] = args;
 				const char* env[] = { "LD_LIBRARY_PATH=/opt/vc/libs:/usr/lib/omxplayer", NULL };
 
-				// Redirect stdout
-				//int fdin = open("/dev/null", O_RDONLY);
-				//int fdout = open("/dev/null", O_WRONLY);
-				//dup2(fdin, 0);
-				//dup2(fdout, 1);
 				// Run the omxplayer binary
 				fprintf(stderr, "%s : mpos %f %f msize %f %f morigin %f %f screen %d %d\n", buf, mPosition.x(), mPosition.y(), mSize.x(), mSize.y(), mOrigin.x(), mOrigin.y(), Renderer::getScreenWidth(), Renderer::getScreenHeight());
 char** pArg = (char**)argv;
@@ -184,7 +180,13 @@ while( *pArg )
 fputs(*pArg, stderr); fputs(" ", stderr);
 pArg++;
 }
-				execve("/usr/bin/omxplayer.bin", (char**)argv, (char**)env);
+                                // Redirect stdout
+                                int fdin = open("/dev/null", O_RDONLY);
+                                int fdout = open("/dev/null", O_WRONLY);
+                                dup2(fdin, 0);
+                                dup2(fdout, 1);
+				signal(SIGTTIN, catch_sigttin);
+                                execve("/usr/bin/omxplayer.bin", (char**)argv, (char**)env);
 
 				_exit(EXIT_FAILURE);
 			}
@@ -195,8 +197,14 @@ pArg++;
 void catch_child(int sig_num)
 {
     /* when we get here, we know there's a zombie child waiting */
+    fprintf(stderr, "waiting zombie\n");
     int child_status;
     wait(&child_status);
+}
+
+void catch_sigttin(int sig_num)
+{
+    fprintf(stderr, "got SIGTTIN\n");
 }
 
 void VideoPlayerComponent::stopVideo()
@@ -207,6 +215,7 @@ void VideoPlayerComponent::stopVideo()
 	// Stop the player process
 	if (mPlayerPid != -1)
 	{
+fprintf(stderr, "StopPid : %d\n", mPlayerPid);
 		int status;
 		kill(mPlayerPid, SIGKILL);
 		waitpid(mPlayerPid, &status, WNOHANG);
